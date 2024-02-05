@@ -5,6 +5,7 @@ import { BookingsModule } from './bookings/bookings.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { TwilioModule } from './twilio/twilio.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -17,6 +18,7 @@ import * as Joi from 'joi';
             }),
         }),
         AuthModule,
+        TwilioModule,
     ],
     controllers: [AppController],
     providers: [AppService],
