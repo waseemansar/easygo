@@ -1,14 +1,32 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { PrismaClientValidationError } from '@prisma/client/runtime/library';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
-import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class BookingsService {
     constructor(private readonly prismaService: PrismaService) {}
 
-    create(createBookingDto: CreateBookingDto) {
-        return 'This action adds a new booking';
+    async create(createBookingDto: CreateBookingDto) {
+        try {
+            const booking = await this.prismaService.booking.create({
+                data: {
+                    ...createBookingDto,
+                    arrivalDate: new Date(createBookingDto.arrivalDate),
+                    departureDate: new Date(createBookingDto.departureDate),
+                    userId: 'cls7s0gyn0000fu7tuu24dmkq',
+                },
+            });
+
+            return booking;
+        } catch (error) {
+            if (error instanceof PrismaClientValidationError) {
+                throw new BadRequestException();
+            }
+
+            throw new InternalServerErrorException('Cannot create booking');
+        }
     }
 
     findAll() {
@@ -24,11 +42,32 @@ export class BookingsService {
         return booking;
     }
 
-    update(id: number, updateBookingDto: UpdateBookingDto) {
-        return `This action updates a #${id} booking`;
+    async update(id: string, updateBookingDto: UpdateBookingDto) {
+        await this.findOne(id);
+
+        try {
+            const booking = await this.prismaService.booking.update({
+                where: { id },
+                data: {
+                    ...updateBookingDto,
+                    arrivalDate: updateBookingDto.arrivalDate ? new Date(updateBookingDto.arrivalDate) : undefined,
+                    departureDate: updateBookingDto.departureDate ? new Date(updateBookingDto.departureDate) : undefined,
+                },
+            });
+
+            return booking;
+        } catch (error) {
+            if (error instanceof PrismaClientValidationError) {
+                throw new BadRequestException();
+            }
+
+            throw new InternalServerErrorException('Cannot create booking');
+        }
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} booking`;
+    remove(id: string) {
+        return this.prismaService.booking.delete({
+            where: { id },
+        });
     }
 }
