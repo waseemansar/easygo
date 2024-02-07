@@ -15,8 +15,8 @@ async function main() {
     const user = await prisma.user.create({
         data: {
             name: 'Waseem Ansar',
-            email: 'waseemansarmalik@gmail.com',
-            mobile: '+971502749081',
+            email: 'waseemansar@outlook.com',
+            mobile: '+971502561253',
         },
     });
 
