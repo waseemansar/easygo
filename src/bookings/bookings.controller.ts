@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { ActiveUser } from '../auth/decorators/active-user.decorator';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
@@ -8,8 +9,8 @@ export class BookingsController {
     constructor(private readonly bookingsService: BookingsService) {}
 
     @Post()
-    create(@Body() createBookingDto: CreateBookingDto) {
-        return this.bookingsService.create(createBookingDto);
+    create(@Body() createBookingDto: CreateBookingDto, @ActiveUser('sub') userId: string) {
+        return this.bookingsService.create(createBookingDto, userId);
     }
 
     @Get()

@@ -8,14 +8,14 @@ import { UpdateBookingDto } from './dto/update-booking.dto';
 export class BookingsService {
     constructor(private readonly prismaService: PrismaService) {}
 
-    async create(createBookingDto: CreateBookingDto) {
+    async create(createBookingDto: CreateBookingDto, userId: string) {
         try {
             const booking = await this.prismaService.booking.create({
                 data: {
                     ...createBookingDto,
                     arrivalDate: new Date(createBookingDto.arrivalDate),
                     departureDate: new Date(createBookingDto.departureDate),
-                    userId: 'cls7s0gyn0000fu7tuu24dmkq',
+                    userId,
                 },
             });
 

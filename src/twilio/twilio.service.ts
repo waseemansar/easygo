@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import * as twilio from 'twilio';
 import TwilioClient from 'twilio/lib/rest/Twilio';
@@ -20,18 +20,32 @@ export class TwilioService {
                 channel: 'sms',
             });
         } catch (error) {
-            throw new TwilioError('Error sending verification code');
+            if (error.code === 60200) {
+                throw new TwilioError();
+            }
+
+            throw new InternalServerErrorException();
         }
     }
 
-    async verifyCode(to: string, code: string): Promise<void> {
+    async verifyCode(to: string, code: string): Promise<boolean> {
         try {
-            await this.client.verify.v2.services(this.twilioConfiguration.serviceSID).verificationChecks.create({
+            const response = await this.client.verify.v2.services(this.twilioConfiguration.serviceSID).verificationChecks.create({
                 to: to,
                 code: code,
             });
+
+            if (response.status === 'approved') {
+                return true;
+            }
+
+            return false;
         } catch (error) {
-            throw new TwilioError('Error verifying code');
+            if (error.code === 60200 || error.code === 20404) {
+                throw new TwilioError();
+            }
+
+            throw new InternalServerErrorException();
         }
     }
 }
