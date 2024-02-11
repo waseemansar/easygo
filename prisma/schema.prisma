@@ -15,7 +15,8 @@ model User {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    bookings Booking[]
+    bookings     Booking[]
+    RefreshToken RefreshToken?
 
     @@map("users")
 }
@@ -47,4 +48,14 @@ model Booking {
     userId String
 
     @@map("bookinngs")
+}
+
+model RefreshToken {
+    id      String @id @default(cuid())
+    tokenId String
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String @unique
+
+    @@map("refresh_tokens")
 }
