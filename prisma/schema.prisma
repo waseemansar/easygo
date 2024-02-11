@@ -51,8 +51,7 @@ model Booking {
 }
 
 model RefreshToken {
-    id      String @id @default(cuid())
-    tokenId String
+    id String @id @default(cuid())
 
     user   User   @relation(fields: [userId], references: [id])
     userId String @unique
