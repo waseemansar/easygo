@@ -1,16 +1,24 @@
 import { User } from '.prisma/client';
-import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
-import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { TwilioError } from '../twilio/errors/twilio.error';
 import { TwilioService } from '../twilio/twilio.service';
 import { jwtConfig } from './config/jwt.config';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { SendVerificationCodeDto } from './dto/send-verification-code.dto';
 import { SignupDto } from './dto/signup.dto';
 import { VerifyCodeDto } from './dto/verify-code.dto';
+import { InvalidRefreshTokenError } from './errors/invalid-refresh-token.error';
 import { ActiveUserData } from './interfaces/active-user-data.interface';
 
 @Injectable()
@@ -77,9 +85,46 @@ export class AuthService {
         }
     }
 
-    async generateTokens(user?: User) {
+    async refreshTokens(refreshTokenDto: RefreshTokenDto) {
+        try {
+            const { sub, refreshTokenId } = await this.jwtService.verifyAsync<Pick<ActiveUserData, 'sub'> & { refreshTokenId: string }>(
+                refreshTokenDto.refreshToken,
+                {
+                    secret: this.jwtConfiguration.secret,
+                    audience: this.jwtConfiguration.audience,
+                    issuer: this.jwtConfiguration.issuer,
+                },
+            );
+
+            const user = await this.prismaService.user.findUnique({ where: { id: sub } });
+            if (user == null) {
+                throw new NotFoundException();
+            }
+
+            const existingTokenn = await this.prismaService.refreshToken.findUnique({ where: { id: refreshTokenId, userId: user.id } });
+            if (existingTokenn) {
+                await this.prismaService.refreshToken.delete({ where: { id: refreshTokenId } });
+            } else {
+                throw new InvalidRefreshTokenError('Refresh token is invalid');
+            }
+
+            return this.generateTokens(user);
+        } catch (error) {
+            if (error instanceof InvalidRefreshTokenError) {
+                throw new UnauthorizedException(error.message);
+            }
+
+            throw new UnauthorizedException();
+        }
+    }
+
+    private async generateTokens(user?: User) {
         if (user) {
-            const refreshTokenId = randomUUID();
+            const { id: refreshTokenId } = await this.prismaService.refreshToken.upsert({
+                where: { userId: user.id },
+                update: {},
+                create: { userId: user.id },
+            });
 
             const [accessToken, refreshToken] = await Promise.all([
                 this.signToken<Partial<ActiveUserData>>(user.id, this.jwtConfiguration.accessTokenTtl, {
