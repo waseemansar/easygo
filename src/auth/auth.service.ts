@@ -1,6 +1,7 @@
 import { User } from '.prisma/client';
 import {
     BadRequestException,
+    ConflictException,
     Inject,
     Injectable,
     InternalServerErrorException,
@@ -78,7 +79,7 @@ export class AuthService {
             if (error instanceof PrismaClientValidationError) {
                 throw new BadRequestException();
             } else if (error instanceof PrismaClientKnownRequestError) {
-                throw new BadRequestException('Email or mobile no already exists');
+                throw new ConflictException('Email or mobile no already exists');
             }
 
             throw new InternalServerErrorException('Cannot signup');
