@@ -1,6 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { IsMobileNumberValid } from '../decorators/is-mobile-number-valid.decorator';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class SignupDto {
     @ApiProperty({ description: 'The name of the user to signin in or signup.' })

@@ -1,4 +1,3 @@
-import { User } from '.prisma/client';
 import {
     BadRequestException,
     ConflictException,
@@ -10,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../prisma/prisma.service';
 import { TwilioError } from '../twilio/errors/twilio.error';
