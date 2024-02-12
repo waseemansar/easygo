@@ -6,6 +6,7 @@ import { RefreshTokenResponseDto } from './dto/refresh-token-response.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { SendVerificationCodeResponseDto } from './dto/send-verification-code-response.dto';
 import { SendVerificationCodeDto } from './dto/send-verification-code.dto';
+import { SignupResponseDto } from './dto/signup-response.dto';
 import { SignupDto } from './dto/signup.dto';
 import { VerifyCodeResponseDto } from './dto/verify-code-response.dto';
 import { VerifyCodeDto } from './dto/verify-code.dto';
@@ -38,6 +39,7 @@ export class AuthController {
     @ApiOperation({ summary: 'Signnup' })
     @ApiBadRequestResponse({ description: 'Upon any data validation failed' })
     @ApiConflictResponse({ description: 'If provided mobile no or emaail already being used by any other user' })
+    @ApiOkResponse({ type: SignupResponseDto })
     @Post('signup')
     signup(@Body() signupDto: SignupDto) {
         return this.authService.signup(signupDto);
