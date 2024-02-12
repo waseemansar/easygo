@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException, NotFound
 import { PrismaClientValidationError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 
 @Injectable()
@@ -29,8 +30,16 @@ export class BookingsService {
         }
     }
 
-    findAll() {
-        return this.prismaService.booking.findMany();
+    findAll(paginationQueryDto: PaginationQueryDto) {
+        const { limit, offset } = paginationQueryDto;
+
+        return this.prismaService.booking.findMany({
+            orderBy: {
+                id: 'desc',
+            },
+            take: limit,
+            skip: offset,
+        });
     }
 
     async findOne(id: string) {

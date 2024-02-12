@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ActiveUser } from '../auth/decorators/active-user.decorator';
 import { BookingsService } from './bookings.service';
 import { BookingResponseDto } from './dto/booking-response.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 
 @ApiBearerAuth()
@@ -23,8 +24,8 @@ export class BookingsController {
     @ApiOperation({ summary: 'Get all Bookings' })
     @ApiOkResponse({ type: BookingResponseDto, isArray: true })
     @Get()
-    findAll() {
-        return this.bookingsService.findAll();
+    findAll(@Query() paginationQueryDto: PaginationQueryDto) {
+        return this.bookingsService.findAll(paginationQueryDto);
     }
 
     @ApiOperation({ summary: 'Get Booking' })
