@@ -24,8 +24,8 @@ export class BookingsController {
     @ApiOperation({ summary: 'Get all Bookings' })
     @ApiOkResponse({ type: BookingResponseDto, isArray: true })
     @Get()
-    findAll(@Query() paginationQueryDto: PaginationQueryDto) {
-        return this.bookingsService.findAll(paginationQueryDto);
+    findAll(@Query() paginationQueryDto: PaginationQueryDto, @ActiveUser('sub') userId: string) {
+        return this.bookingsService.findAll(paginationQueryDto, userId);
     }
 
     @ApiOperation({ summary: 'Get Booking' })

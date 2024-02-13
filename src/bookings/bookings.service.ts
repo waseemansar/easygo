@@ -30,10 +30,11 @@ export class BookingsService {
         }
     }
 
-    findAll(paginationQueryDto: PaginationQueryDto) {
+    findAll(paginationQueryDto: PaginationQueryDto, userId: string) {
         const { limit, offset } = paginationQueryDto;
 
         return this.prismaService.booking.findMany({
+            where: { userId },
             orderBy: {
                 id: 'desc',
             },
