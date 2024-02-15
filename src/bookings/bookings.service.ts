@@ -71,7 +71,7 @@ export class BookingsService {
                 throw new BadRequestException();
             }
 
-            throw new InternalServerErrorException('Cannot create booking');
+            throw new InternalServerErrorException('Cannot update booking');
         }
     }
 
