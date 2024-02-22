@@ -16,7 +16,14 @@ async function bootstrap() {
         }),
     );
 
-    const config = new DocumentBuilder().setTitle('EasyGo').setDescription('EasyGo API').setVersion('1.0').addBearerAuth().build();
+    const config = new DocumentBuilder()
+        .setTitle('EasyGo')
+        .setDescription(
+            'The EasyGo API is developed using NestJS and leverages a PostgreSQL database and Prisma ORM. It comprises two main modules: Auth and Bookings.',
+        )
+        .setVersion('1.0')
+        .addBearerAuth()
+        .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);
 
